@@ -12,7 +12,6 @@ class MainApp(tk.Tk):
         super().__init__()
         self.title('Canteen Orderng Applicaton')
         self.geometry("500x170")
-
         # For when the user clicks the exit button
         self.protocol("WM_DELETE_WINDOW", self.close_window) 
 
@@ -29,16 +28,13 @@ class MainApp(tk.Tk):
                               justify='center', style='L.TLabel')
         intro_lbl.grid(row=1, columnspan=2, padx=5, pady=5)
 
-        admin_btn = ttk.Button(window, text="Admin", command=self.staff)
+        admin_btn = ttk.Button(window, text="Admin", 
+                              command=lambda: self.open_window(Admin))
         admin_btn.grid(row=2, column=0, padx=5, pady=5, sticky="NE")
 
-        student_btn = ttk.Button(window, text="Student", command=self.student)
+        student_btn = ttk.Button(window, text="Student", 
+                                command=lambda: self.open_window(Student))
         student_btn.grid(row=2, column=1, padx=5, pady=5, sticky="NW")
-
-    def close_window(self): # For when the user presses the x(exit) button
-        Exit = tkinter.messagebox.askyesno("Exit?", "Are you sure you wish to exit?")
-        if Exit > 0:
-            sys.exit()
 
     # Creates all the variables for styling (In a method in case I need to access variables from another class)
     def styling(self): 
@@ -66,24 +62,78 @@ class MainApp(tk.Tk):
         self.TEntry.configure("EntryStyle.TEntry",)
         return
 
-    def staff(self): # For when a canteen staff wants to do Admin stuff
+    def close_window(self): # For when the user presses the x(exit) button
+        Exit = tkinter.messagebox.askyesno("Exit?", "Are you sure you wish to exit?")
+        if Exit > 0:
+            sys.exit()
+            
+    # For when the user clicks something but wishes to return back
+    def go_back(self): 
+        self.parent.destroy()
+        app.deiconify()
+
+    def open_window(self, chosen_window):
         self.withdraw()
         window = tk.Toplevel(self)
-        Admin(window)
-    
-    def student(self): # For when a student wishes to place an order
-        print("Bye")
+        chosen_window(window)
+
+class Student(tk.Frame, MainApp):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.parent.geometry("450x600")
+        self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
+
+        
+        self.styling()
+        self.parent.configure(background=self.bg_color)
+
+        self.order_frm = ttk.LabelFrame(self.parent, text='Order:', width=500,
+                                    height=500, style='LF.TLabelframe')
+        self.menu_frm = ttk.LabelFrame(self.parent, text='Menu:', width=500,
+                                    height=500, style='LF.TLabelframe')
+        self.button_frm = ttk.LabelFrame(self.parent, text='Buttons:', 
+                                        width=500, height=500, 
+                                        style='LF.TLabelframe')
+        self.order_frm.grid(row=0, columnspan=3, padx=10, pady=10)
+        self.menu_frm.grid(row=2, columnspan=3, padx=10, pady=10)
+        self.button_frm.grid(row=20, columnspan=3, padx=10, pady=10)
+        order = "Please choose the items you would like to order. From the list\n below"
+        order_lbl = ttk.Label(self.order_frm, text=order, justify='center',
+                             font=(self.txt_style), style='L.TLabel')
+        order_lbl.grid(row=1, columnspan=3, padx=5, pady=5)
+        separator = ttk.Separator(self.order_frm, orient='horizontal')
+        separator.grid(row=2, columnspan=3, ipadx=170, padx=5, pady=5)
+
+
+        self.menu()
+
+    def menu(self):
+        from cafe_menu import menu_items
+
+        rows = 3
+        for cat, price in menu_items['BEVERAGES'].items():
+            rows += 1
+            items_txt = f"{cat} ${price}0"
+            item_lbl = ttk.Label(self.menu_frm, text=items_txt,
+                                font=(self.txt_style), justify='left',
+                                 style='L.TLabel')
+            item_lbl.grid(row=rows, column=1, padx=5, pady=5)
+
+        back_btn = ttk.Button(self.button_frm, text="Go Back", 
+                             command=lambda: self.go_back())
+        back_btn.grid(row=20, column=1, pady=5, sticky="NW")
+
         
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
         self.parent.geometry("440x210")
-        
+        self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
+
         self.styling()
         self.parent.configure(background=self.bg_color)
-
-        self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
 
         self.login_frm = ttk.LabelFrame(self.parent, text='Login:', width=500,
                                     height=500, style='LF.TLabelframe')
@@ -140,9 +190,7 @@ class Admin(tk.Frame, MainApp):
         elif self.check.get() == 0 :
             password_entry.configure(show = "*")
                 
-    def go_back(self):
-        self.parent.destroy()
-        app.deiconify()
+
 if __name__ == "__main__": 
     app = MainApp()
     app.mainloop()
