@@ -2,10 +2,12 @@
 # 3DIP Internal Assessment - An online canteen ordering application
 # | Import tkinter | Import ttk (tkinter styling) 
 # | Imports sys for exit | Messagebox for windows pop up
+from genericpath import exists
 from textwrap import fill
 import tkinter as tk
 from tkinter import ttk
 import sys, tkinter.messagebox
+from unicodedata import category
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -81,23 +83,23 @@ class Student(tk.Frame, MainApp):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-        self.parent.geometry("450x600")
         self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
 
         
         self.styling()
         self.parent.configure(background=self.bg_color)
 
-        self.order_frm = ttk.LabelFrame(self.parent, text='Order:', width=500,
-                                    height=500, style='LF.TLabelframe')
-        self.menu_frm = ttk.LabelFrame(self.parent, text='Menu:', width=500,
-                                    height=500, style='LF.TLabelframe')
-        self.button_frm = ttk.LabelFrame(self.parent, text='Buttons:', 
-                                        width=500, height=500, 
+        self.order_frm = ttk.LabelFrame(self.parent, text='Order:', width=700,
+                                    height=700, style='LF.TLabelframe')
+        self.menu_frm = ttk.LabelFrame(self.parent, text='Menu:',
+                                        style='LF.TLabelframe')
+        self.button_frm = ttk.LabelFrame(self.parent, text='Type of Food:', 
+                                        width=700, height=700, 
                                         style='LF.TLabelframe')
         self.order_frm.grid(row=0, columnspan=3, padx=10, pady=10)
+        self.button_frm.grid(row=1, columnspan=3, padx=10, pady=10)
         self.menu_frm.grid(row=2, columnspan=3, padx=10, pady=10)
-        self.button_frm.grid(row=20, columnspan=3, padx=10, pady=10)
+
         order = "Please choose the items you would like to order. From the list\n below"
         order_lbl = ttk.Label(self.order_frm, text=order, justify='center',
                              font=(self.txt_style), style='L.TLabel')
@@ -105,26 +107,76 @@ class Student(tk.Frame, MainApp):
         separator = ttk.Separator(self.order_frm, orient='horizontal')
         separator.grid(row=2, columnspan=3, ipadx=170, padx=5, pady=5)
 
-
         self.menu()
 
     def menu(self):
         from cafe_menu import menu_items
+        self.menu_items = menu_items
 
-        rows = 3
-        for cat, price in menu_items['BEVERAGES'].items():
-            rows += 1
-            items_txt = f"{cat} ${price}0"
-            item_lbl = ttk.Label(self.menu_frm, text=items_txt,
-                                font=(self.txt_style), justify='left',
-                                 style='L.TLabel')
-            item_lbl.grid(row=rows, column=1, padx=5, pady=5)
+        Special_meals_btn = ttk.Button(self.button_frm, 
+                                       text="Special Meals of the week", 
+                                      command=lambda: self.display_category
+                                      ('special meals of the week'))
+
+        beverages_btn = ttk.Button(self.button_frm, text="Beverages", 
+                             command=lambda: self.display_category('beverages'))
+
+        hot_lunch_btn = ttk.Button(self.button_frm, text="Hot Lunchs", 
+                        command=lambda: self.display_category('hot lunchs'))
+
+        healthy_choices_btn = ttk.Button(self.button_frm,
+                                        text="Healthy Choices", 
+                                        command=lambda: 
+                                        self.display_category('healthy choices')
+                                        )
+
+        snacks_btn = ttk.Button(self.button_frm, text="Snacks", 
+                             command=lambda: self.display_category('snacks'))
 
         back_btn = ttk.Button(self.button_frm, text="Go Back", 
                              command=lambda: self.go_back())
-        back_btn.grid(row=20, column=1, pady=5, sticky="NW")
 
-        
+        cost_btn = ttk.Button(self.button_frm, text="Cost", 
+                             command=lambda: self.add_cost())
+
+        Special_meals_btn.grid(row=3, column=1, padx=5, pady=5, sticky="NW")
+        beverages_btn.grid(row=3, column=2, padx=5, pady=5, sticky="NW")    
+        hot_lunch_btn.grid(row=3, column=3, padx=5, pady=5, sticky="NW")    
+        healthy_choices_btn.grid(row=3, column=4, padx=5, pady=5,
+                                sticky="NW")    
+        snacks_btn.grid(row=3, column=5, padx=5, pady=5, sticky="NW")    
+        back_btn.grid(row=3, column=6, padx=5, pady=5, sticky="NW")
+        cost_btn.grid(row=3, column=7, padx=5, pady=5, sticky="NW")
+
+    def display_category(self, type_category):
+            for widgets in self.menu_frm.winfo_children():
+                widgets.destroy()
+            rows = 3
+            columns = 1
+            self.test = []
+            self.test_two = []
+            for item, price in self.menu_items[type_category].items():
+                rows += 1
+                self.itemer = tk.IntVar()
+                self.items_txt = f"{item}: ${price}0"
+                self.item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
+                                    font=(self.txt_style), justify='left',
+                                    style='L.TLabel')
+                self.item_lbl.grid(row=rows, column=columns, padx=5, pady=5)
+
+                self.test.append(price)
+
+                for i in range(10):
+                    self.test_btn = ttk.Button(self.menu_frm, text="Add 1x", 
+                                command=lambda: self.add_cost(i))
+                    self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
+                                        sticky="NW")
+            print(self.test)
+            return
+
+    def add_cost(self, number):
+        print(self.test[-number] * number)
+
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
         super().__init__(parent)
@@ -189,7 +241,7 @@ class Admin(tk.Frame, MainApp):
             password_entry.configure(show = "")
         elif self.check.get() == 0 :
             password_entry.configure(show = "*")
-                
+      
 
 if __name__ == "__main__": 
     app = MainApp()

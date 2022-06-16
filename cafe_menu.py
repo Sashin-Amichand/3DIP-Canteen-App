@@ -1,7 +1,7 @@
 # Created a seperate file containing all the cafeteria food items. 
 # Seperated by categories as well.
 menu_items = {
-    'Special Meals of the week': {
+    'special meals of the week': {
         'Pies – varied': 4.50,
         'Vegetarian / Gluten Free Pies': 5.00,
         'Nachos': 4.50,
@@ -13,7 +13,7 @@ menu_items = {
         'Chicken Burger': 4.50,
         'Sushi': 5.50,}, 
 
-    'BEVERAGES': {
+    'beverages': {
         'Kiwi Crushies': 1.00,
         'Slushies': 2.00,
         'Small Water': 2.00,
@@ -25,7 +25,7 @@ menu_items = {
         'Deep Spring': 4.00,
         'Pump Flavoured Water': 3.50},
     
-    'HOT LUNCHES': {
+    'hot lunchs': {
         'Chicken, Beef, Hot & Spicy Hot Noodles': 3.50,
         'Spaghetti Bun': 2.00,
         'Hash Brown (Interval Only)': 1.50,
@@ -43,7 +43,7 @@ menu_items = {
         'Pork Riblet Burger': 4.50,
         },
 
-    'HEALTHY CHOICES': {
+    'healthy choices': {
 
         'Ham, Chicken, Tuna or Beef Salads 500ml': 6.00,
         'Ham, Chicken, Tuna or Beef Salads 750ml': 7.00,
@@ -58,7 +58,7 @@ menu_items = {
         '(Wintertime only) Soup of the Day with Garlic Bread Roll': 5.50,
         },
 
-    'SNACKS': {
+    'snacks': {
         'Potato Chips': 2.00,
         'Doritos': 2.00,
         'Vege Chips': 2.00,
