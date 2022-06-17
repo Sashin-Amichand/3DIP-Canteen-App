@@ -2,15 +2,15 @@
 # 3DIP Internal Assessment - An online canteen ordering application
 # | Import tkinter | Import ttk (tkinter styling) 
 # | Imports sys for exit | Messagebox for windows pop up
-from genericpath import exists
-from textwrap import fill
 import tkinter as tk
 from tkinter import ttk
 import sys, tkinter.messagebox
-from unicodedata import category
 
 class MainApp(tk.Tk):
+    '''The class where my tkinter app is initilized, and any methods needed for the majority of my other classes is stored here ready for inhertiance.'''
+
     def __init__(self):
+        '''Intializes tkinter and the basic window attributes.'''
         super().__init__()
         self.title('Canteen Orderng Applicaton')
         self.geometry("500x170")
@@ -19,33 +19,42 @@ class MainApp(tk.Tk):
 
         self.styling()
         self.configure(background=self.bg_color)
+        self.intro()
 
-        window = ttk.LabelFrame(self, text='Welcome!', width=1000, 
+    def intro(self):
+        '''Creates/Displays the introduction widgets.'''
+        self.window = ttk.LabelFrame(self, text='Welcome!', width=1000, 
                                 height=1000, style='LF.TLabelframe')
-        window.grid(row=0, column=0, padx=10, pady=10)
+        self.window.grid(row=0, column=0, padx=10, pady=10)
 
         intro = "Welcome to my Canteen Ordering App! This app will allow you to\n place your order at the canteen, and you shall recieve a notification\n on when it is ready for you to pick up! If you wish to order click\n Student, if you work at the canteen then click Admin."
 
-        intro_lbl = ttk.Label(window, text=intro, font=(self.txt_style), 
+        intro_lbl = ttk.Label(self.window, text=intro, font=(self.txt_style), 
                               justify='center', style='L.TLabel')
         intro_lbl.grid(row=1, columnspan=2, padx=5, pady=5)
 
-        admin_btn = ttk.Button(window, text="Admin", 
-                              command=lambda: self.open_window(Admin))
-        admin_btn.grid(row=2, column=0, padx=5, pady=5, sticky="NE")
-
-        student_btn = ttk.Button(window, text="Student", 
+        admin_btn = ttk.Button(self.window, text="Admin", 
+                                command=lambda: self.open_window(Admin))
+        student_btn = ttk.Button(self.window, text="Student", 
                                 command=lambda: self.open_window(Student))
-        student_btn.grid(row=2, column=1, padx=5, pady=5, sticky="NW")
 
-    # Creates all the variables for styling (In a method in case I need to access variables from another class)
+        admin_btn.grid(row=2, column=0, padx=5, pady=5, sticky="NE")
+        student_btn.grid(row=2, column=1, padx=5, pady=5, sticky="NW")
+        
+    def open_window(self, chosen_window=None):
+        '''Simple method to display the window of the users choice.'''
+        if chosen_window is not None:
+            self.withdraw()
+            show_window = tk.Toplevel(self)
+            chosen_window(show_window)
+
     def styling(self): 
+        '''Creates the variables used for styling'''
         self.bg_color = '#61002f'
         self.frm_style = 'Cormorant', '18', 'bold'
         self.txt_style = 'Cormorant', '12'
         self.txt_color = "#89c9ec"
 
-        # Styling my app (colors etc) 
         self.MLFrame = ttk.Style()
         self.MLFrame.configure('LF.TLabelframe', background=self.bg_color)
         self.MLFrame.configure('LF.TLabelframe.Label', 
@@ -62,30 +71,27 @@ class MainApp(tk.Tk):
         
         self.TEntry = ttk.Style()
         self.TEntry.configure("EntryStyle.TEntry",)
-        return
 
-    def close_window(self): # For when the user presses the x(exit) button
+    def close_window(self): 
+        '''Required for when the user wishes to close the program'''
         Exit = tkinter.messagebox.askyesno("Exit?", "Are you sure you wish to exit?")
         if Exit > 0:
             sys.exit()
             
-    # For when the user clicks something but wishes to return back
     def go_back(self): 
-        self.parent.destroy()
+        '''Required for when the user wishes to go back a window/screen.'''
+        self.parent.withdraw()
         app.deiconify()
 
-    def open_window(self, chosen_window):
-        self.withdraw()
-        window = tk.Toplevel(self)
-        chosen_window(window)
 
 class Student(tk.Frame, MainApp):
+    '''The class that models the student window/ordering processes.'''
+
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
         self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
 
-        
         self.styling()
         self.parent.configure(background=self.bg_color)
 
@@ -110,17 +116,21 @@ class Student(tk.Frame, MainApp):
         self.menu()
 
     def menu(self):
-        from cafe_menu import menu_items
+        '''Method displaying the widgets on this window.'''
+
+        # Imports a dictionary storing cafeteria menu items.
+        from cafe_menu import menu_items 
+
         self.menu_items = menu_items
 
-        Special_meals_btn = ttk.Button(self.button_frm, 
+        special_meals_btn = ttk.Button(self.button_frm, 
                                        text="Special Meals of the week", 
                                       command=lambda: self.display_category
                                       ('special meals of the week'))
 
         beverages_btn = ttk.Button(self.button_frm, text="Beverages", 
                              command=lambda: self.display_category('beverages'))
-
+                             
         hot_lunch_btn = ttk.Button(self.button_frm, text="Hot Lunchs", 
                         command=lambda: self.display_category('hot lunchs'))
 
@@ -139,7 +149,7 @@ class Student(tk.Frame, MainApp):
         cost_btn = ttk.Button(self.button_frm, text="Cost", 
                              command=lambda: self.add_cost())
 
-        Special_meals_btn.grid(row=3, column=1, padx=5, pady=5, sticky="NW")
+        special_meals_btn.grid(row=3, column=1, padx=5, pady=5, sticky="NW")
         beverages_btn.grid(row=3, column=2, padx=5, pady=5, sticky="NW")    
         hot_lunch_btn.grid(row=3, column=3, padx=5, pady=5, sticky="NW")    
         healthy_choices_btn.grid(row=3, column=4, padx=5, pady=5,
@@ -149,33 +159,39 @@ class Student(tk.Frame, MainApp):
         cost_btn.grid(row=3, column=7, padx=5, pady=5, sticky="NW")
 
     def display_category(self, type_category):
-            for widgets in self.menu_frm.winfo_children():
-                widgets.destroy()
-            rows = 3
-            columns = 1
-            self.test = []
-            self.test_two = []
-            for item, price in self.menu_items[type_category].items():
-                rows += 1
-                self.itemer = tk.IntVar()
-                self.items_txt = f"{item}: ${price}0"
-                self.item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
-                                    font=(self.txt_style), justify='left',
-                                    style='L.TLabel')
-                self.item_lbl.grid(row=rows, column=columns, padx=5, pady=5)
+        '''Method that displays the cafeteria menu item widgets based on the category selected.'''
 
-                self.test.append(price)
+        self.item_prices = []
+        self.menu_category = self.menu_items[type_category]
+        num_items = len(self.menu_category)
+        rows = 3
+        columns = 1
+        self.test = []
+        for widgets in self.menu_frm.winfo_children():
+            widgets.grid_remove()
 
-                for i in range(10):
-                    self.test_btn = ttk.Button(self.menu_frm, text="Add 1x", 
-                                command=lambda: self.add_cost(i))
-                    self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
-                                        sticky="NW")
-            print(self.test)
-            return
+        for item, price in self.menu_category.items():
+            rows += 1
+            self.items_txt = f"{item}: ${price}0"
+            self.item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
+                                font=(self.txt_style), justify='left',
+                                style='L.TLabel')
+            self.item_lbl.grid(row=rows, column=columns, padx=5, pady=5)
+            self.item_prices.append(price)
+            self.test.append(item)
 
-    def add_cost(self, number):
-        print(self.test[-number] * number)
+        rows = 3
+        for i in range(num_items):
+            rows += 1
+            print(i)
+            self.test_btn = ttk.Button(self.menu_frm, 
+                                        text=self.test[i], 
+                                    command=self.test.append(i))
+            self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
+                                sticky="NW")
+
+    def add_cost(self):
+        print(self.test)
 
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
