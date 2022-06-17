@@ -11,7 +11,8 @@ menu_items = {
         'Homemade Quiches': 4.50,
         'Hot Meal': 5.50,
         'Chicken Burger': 4.50,
-        'Sushi': 5.50,}, 
+        'Sushi': 5.50, 
+        'Su': 6.50,}, 
 
     'beverages': {
         'Kiwi Crushies': 1.00,

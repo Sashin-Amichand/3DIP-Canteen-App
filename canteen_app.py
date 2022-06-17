@@ -160,38 +160,45 @@ class Student(tk.Frame, MainApp):
 
     def display_category(self, type_category):
         '''Method that displays the cafeteria menu item widgets based on the category selected.'''
-
-        self.item_prices = []
-        self.menu_category = self.menu_items[type_category]
-        num_items = len(self.menu_category)
+        for widgets in self.menu_frm.winfo_children():
+                widgets.destroy()
         rows = 3
         columns = 1
+        t = 0
+        self.e = 0
         self.test = []
-        for widgets in self.menu_frm.winfo_children():
-            widgets.grid_remove()
+        self.test_two = []
+        self.new = []
 
-        for item, price in self.menu_category.items():
+        mm = self.menu_items[type_category]
+        for item, price in mm.items():
             rows += 1
+            self.itemer = tk.IntVar()
             self.items_txt = f"{item}: ${price}0"
             self.item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
                                 font=(self.txt_style), justify='left',
                                 style='L.TLabel')
             self.item_lbl.grid(row=rows, column=columns, padx=5, pady=5)
-            self.item_prices.append(price)
-            self.test.append(item)
 
-        rows = 3
-        for i in range(num_items):
-            rows += 1
-            print(i)
-            self.test_btn = ttk.Button(self.menu_frm, 
-                                        text=self.test[i], 
-                                    command=self.test.append(i))
+            self.test.append(price)
+
+            self.test_btn = ttk.Button(self.menu_frm, text="Add 1x", 
+                        command=lambda i=t, o=self.e:  self.add_cost(i, o))
             self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
                                 sticky="NW")
+            t += 1
+            self.new.append(0)
 
-    def add_cost(self):
         print(self.test)
+        return
+
+    def add_cost(self, number, numbertwo):
+        self.new[numbertwo] += 1
+        tesst = self.test[number] * self.new[number]
+        cost = []
+        cost.append(tesst)
+        print(cost)
+
 
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
