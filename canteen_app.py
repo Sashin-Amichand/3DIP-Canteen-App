@@ -2,12 +2,9 @@
 # 3DIP Internal Assessment - An online canteen ordering application
 # | Import tkinter | Import ttk (tkinter styling) 
 # | Imports sys for exit | Messagebox for windows pop up
-from genericpath import exists
-from textwrap import fill
 import tkinter as tk
 from tkinter import ttk
 import sys, tkinter.messagebox
-from unicodedata import category
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -153,9 +150,14 @@ class Student(tk.Frame, MainApp):
                 widgets.destroy()
             rows = 3
             columns = 1
+            t = 0
+            self.e = 0
             self.test = []
             self.test_two = []
-            for item, price in self.menu_items[type_category].items():
+            self.new = []
+
+            mm = self.menu_items[type_category]
+            for item, price in mm.items():
                 rows += 1
                 self.itemer = tk.IntVar()
                 self.items_txt = f"{item}: ${price}0"
@@ -166,16 +168,23 @@ class Student(tk.Frame, MainApp):
 
                 self.test.append(price)
 
-                for i in range(10):
-                    self.test_btn = ttk.Button(self.menu_frm, text="Add 1x", 
-                                command=lambda: self.add_cost(i))
-                    self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
-                                        sticky="NW")
+                self.test_btn = ttk.Button(self.menu_frm, text="Add 1x", 
+                            command=lambda i=t, o=self.e:  self.add_cost(i, o))
+                self.test_btn.grid(row=rows, column=2, padx=5, pady=5, 
+                                    sticky="NW")
+                t += 1
+                self.new.append(0)
+
             print(self.test)
             return
 
-    def add_cost(self, number):
-        print(self.test[-number] * number)
+    def add_cost(self, number, numbertwo):
+        self.new[numbertwo] += 1
+        tesst = self.test[number] * self.new[number]
+        cost = []
+        cost.append(tesst)
+        print(cost)
+
 
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
