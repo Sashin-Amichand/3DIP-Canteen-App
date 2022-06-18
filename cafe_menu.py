@@ -12,7 +12,7 @@ menu_items = {
         'Hot Meal': 5.50,
         'Chicken Burger': 4.50,
         'Sushi': 5.50, 
-        'Su': 6.50,}, 
+        },
 
     'beverages': {
         'Kiwi Crushies': 1.00,
@@ -24,10 +24,11 @@ menu_items = {
         'Barista Bros': 4.00,
         'Keri Juice': 3.00,
         'Deep Spring': 4.00,
-        'Pump Flavoured Water': 3.50},
+        'Pump Flavoured Water': 3.50
+        },
     
-    'hot lunchs': {
-        'Chicken, Beef, Hot & Spicy Hot Noodles': 3.50,
+    'hot lunches': {
+        'Chicken/Beef/Hot & Spicy Hot Noodles': 3.50,
         'Spaghetti Bun': 2.00,
         'Hash Brown (Interval Only)': 1.50,
         'Garlic Bread': 2.00,
@@ -46,14 +47,14 @@ menu_items = {
 
     'healthy choices': {
 
-        'Ham, Chicken, Tuna or Beef Salads 500ml': 6.00,
-        'Ham, Chicken, Tuna or Beef Salads 750ml': 7.00,
-        'Ham, Tuna, Chicken, Beef, Vegetarian Sandwiches': 4.50,
-        'Ham, Tuna, Chicken, Beef, Vegetarian Gluten Free Sandwiches': 5.50,
+        'Ham/Chicken/Tuna/Beef Salads 500ml': 6.00,
+        'Ham/Chicken/Tuna/Beef Salads 750ml': 7.00,
+        'Ham/Tuna/Chicken/Beef/Vegetarian Sandwiches': 4.50,
+        'Ham/Tuna/Chicken/Beef/Vegetarian Gluten Free Sandwiches': 5.50,
         'Chargrilled Chicken Steak, Mayo, Lettuce & Cheese Sub': 4.50,
         '(INC VEG) Pizza Breads': 3.50,
         '(Summertime only) Fruit Salad': 5.00,
-        'Chicken, Ham, Beef Wraps': 5.00,
+        'Chicken/Ham/Beef Wraps': 5.00,
         'Sushi': 5.50,
         '(Wintertime only) Hot Chicken Sub': 4.50,
         '(Wintertime only) Soup of the Day with Garlic Bread Roll': 5.50,
