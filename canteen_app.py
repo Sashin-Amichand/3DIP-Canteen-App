@@ -4,11 +4,11 @@
 # | Imports sys for exit | Messagebox for windows pop up
 import tkinter as tk
 from tkinter import ttk
+from cafe_menu import menu_items 
 import sys, tkinter.messagebox
 
 class MainApp(tk.Tk):
     '''The class where my tkinter app is initilized, and any methods needed for the majority of my other classes is stored here ready for inhertiance.'''
-
     def __init__(self):
         '''Intializes tkinter and the basic window attributes.'''
         super().__init__()
@@ -86,9 +86,8 @@ class MainApp(tk.Tk):
 
 class Student(tk.Frame, MainApp):
     '''The class that models the student window/ordering processes.'''
-
     def __init__(self, parent):
-        '''Intiliazes the styling and frames used for this window.'''
+        '''Intiliazes the styling and variables used for the order widgets.'''
         super().__init__(parent)
         self.parent = parent
         self.parent.protocol("WM_DELETE_WINDOW", self.close_window)
@@ -96,187 +95,172 @@ class Student(tk.Frame, MainApp):
         self.styling()
         self.parent.configure(background=self.bg_color)
 
-        self.intro_frm = ttk.LabelFrame(self.parent, text='Order:', width=700,
+        # Variables storing cost/menu item/food in a category and currently ordered food
+        self.menu_items = menu_items
+        self.prices = []
+        self.food_ordered = []
+        self.current_items = []
+
+        # Variables used to hold the quantity of items the user is ordering, plus the cost of items in a category.
+        self.current_quantity = []
+        self.total_quantity = {}
+        self.current_category_cost = []
+        self.total_category_cost = {}
+        
+        # Variable for the storing individual category costs and then the total cost itself.
+        self.final_cost = {}
+        self.total = 0
+
+        # Frames set
+        self.about_frm = ttk.LabelFrame(self.parent, text='Order:', width=700,
                                     height=700, style='LF.TLabelframe')
         self.menu_frm = ttk.LabelFrame(self.parent, text='Menu:',
                                         style='LF.TLabelframe')
         self.order_frm = ttk.LabelFrame(self.parent, text='Order Items:', 
                                         width=700, height=700, 
                                         style='LF.TLabelframe')
-        self.intro_frm.grid(row=0, columnspan=8, padx=10)
+
+        self.about_frm.grid(row=0, columnspan=8, padx=10)
         self.menu_frm.grid(row=1, columnspan=8, padx=10)
 
+        self.order()
+
+    def order(self):
+        '''Method displaying what this window is, and the category of food.'''
+
         order = "Please choose the items you would like to order, \nfrom the categories below:"
-        order_lbl = ttk.Label(self.intro_frm, text=order, justify='center',
+        order_lbl = ttk.Label(self.about_frm, text=order, justify='center',
                              font=(self.txt_style), style='L.TLabel')
         order_lbl.grid(row=1, columnspan=8, padx=5, pady=5)
-        separator = ttk.Separator(self.intro_frm, orient='horizontal')
+
+        separator = ttk.Separator(self.about_frm, orient='horizontal')
         separator.grid(row=2, columnspan=8, ipadx=170, padx=5, pady=5)
 
-        self.menu()
+        # Goes through the dictionary in cafe_menu.py which hosts the cafeteria items. This allows me to dynamically allocate the amount of buttons needed for the amount of categories there are in that file.
+        columns = 1
+        for name in self.menu_items.keys():
+            beverages_btn = ttk.Button(self.about_frm, text=name.title(), 
+                                command=lambda category=name: self.display_category(category))
+            beverages_btn.grid(row=3, column=columns, padx=5, pady=5, sticky="NW")    
+            columns += 1
 
-    def menu(self):
-        '''Method displaying the widgets on this window and creating variables'''
-
-        # Imports a dictionary storing cafeteria menu items.
-        from cafe_menu import menu_items 
-
-        self.menu_items = menu_items
-        self.prices = []
-        self.quantity = []
-        self.food_ordered = []
-        self.current_items = []
-        self.cost = []
-        self.current_cost = []
-        self.final_cost = []
-        self.total = 0
-
-        special_meals_btn = ttk.Button(self.intro_frm, 
-                                       text="Special Meals of the week", 
-                                      command=lambda: self.display_category
-                                      ('special meals of the week'))
-
-        beverages_btn = ttk.Button(self.intro_frm, text="Beverages", 
-                             command=lambda: self.display_category('beverages'))
-                             
-        hot_lunch_btn = ttk.Button(self.intro_frm, text="Hot Lunchs", 
-                        command=lambda: self.display_category('hot lunchs'))
-
-        healthy_choices_btn = ttk.Button(self.intro_frm,
-                                        text="Healthy Choices", 
-                                        command=lambda: 
-                                        self.display_category('healthy choices')
-                                        )
-
-        snacks_btn = ttk.Button(self.intro_frm, text="Snacks", 
-                             command=lambda: self.display_category('snacks'))
-
-        back_btn = ttk.Button(self.intro_frm, text="Go Back", 
+        back_btn = ttk.Button(self.about_frm, text="Go Back", 
                              command=lambda: self.go_back())
 
-        special_meals_btn.grid(row=3, column=1, padx=5, pady=5, sticky="NW")
-        beverages_btn.grid(row=3, column=2, padx=5, pady=5, sticky="NW")    
-        hot_lunch_btn.grid(row=3, column=3, padx=5, pady=5, sticky="NW")    
-        healthy_choices_btn.grid(row=3, column=4, padx=5, pady=5,
-                                sticky="NW")    
-        snacks_btn.grid(row=3, column=5, padx=5, pady=5, sticky="NW")    
-        back_btn.grid(row=3, column=6, padx=5, pady=5, sticky="NW")
+        back_btn.grid(row=3, column=columns+1, padx=5, pady=5, sticky="NW")
 
     def display_category(self, type_category):
         '''Method that displays the cafeteria menu item widgets based on the category selected.'''
+        self.current_category = type_category
 
-        for widgets in self.menu_frm.winfo_children():
+        for widgets in self.menu_frm.winfo_children(): 
                 widgets.destroy()
 
-        # These if statements clears the lists and current item totals of the previous category of food.
-        if self.quantity or self.cost or self.prices or self.current_cost or self.current_items:
-            del self.quantity[:]
-            del self.cost[:]
+        # This if statement clears the old lists so that the new category stuff may be added
+        if self.current_quantity or self.prices or self.current_category_cost or self.current_items:
+            del self.current_quantity[:]
+            del self.current_category_cost[:]
             del self.prices[:]
             del self.current_items[:]
 
-            previous_final_cost = self.final_cost[-1]
-            del self.final_cost[:]
-            self.final_cost.append(previous_final_cost)
-            self.calc_total()
+        # Checks if the total quantity and final cost dictonaries are empty
+        # If so, it will then add values to them.
+        if len(self.total_quantity) == 0 and len(self.final_cost) == 0:
+            for name in self.menu_items.keys():
+                self.total_quantity[name]  = ''
+                self.final_cost[name]  = 0
+                self.total_category_cost[name]  = 0
 
         rows = 1
         item_number = 0
         del_item = 0
-        self.menu_type = self.menu_items[type_category]
-    
-        for item, price in self.menu_type.items():
-            self.items_txt = f"{item}: ${price}0"
-            self.prices.append(price)
-            self.quantity.append(0)
-            self.cost.append(0)
-            self.current_items.append(item)
 
-            self.item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
+        # Goes through the dictionary in cafe_menu.py which hosts the cafeteria items. This allows me to dynamically allocate values to the necessary 
+        # lists, as well as the number of labels and buttons based on whats in that file.
+        for item, price in self.menu_items[self.current_category].items():
+            self.items_txt = f"{item}: ${price}0"
+            self.current_items.append(item)
+            self.prices.append(price)
+            self.current_quantity.append(0)
+            self.current_category_cost.append(0)
+
+            item_lbl = ttk.Label(self.menu_frm, text=self.items_txt,
                                 font=(self.txt_style), justify='left',
                                 style='L.TLabel')
-            self.item_lbl.grid(row=rows, column=1, padx=5, pady=5)
 
-
-            self.quantity_btn = ttk.Button(self.menu_frm, text="Add 1x", 
+            quantity_btn = ttk.Button(self.menu_frm, text="Add 1x", 
                         command=lambda item_number=item_number:  
                         self.create_cost(item_number))
-            self.quantity_btn.grid(row=rows, column=2, padx=5, pady=5, 
-                                sticky="NW")
-            self.remove_btn = ttk.Button(self.menu_frm, text="Remove item", 
+
+            remove_btn = ttk.Button(self.menu_frm, text="Remove item", 
                         command=lambda del_item=del_item: 
                         self.create_cost(del_item, True))
-            self.remove_btn.grid(row=rows, column=3, padx=5, pady=5, 
-                                sticky="NW")
-       
+
+            item_lbl.grid(row=rows, column=1, padx=5, pady=5)
+            quantity_btn.grid(row=rows, column=2, padx=5, pady=5, sticky="NW")
+            remove_btn.grid(row=rows, column=3, padx=5, pady=5, sticky="NW")
+
             rows += 1
             item_number += 1
             del_item += 1
-
-    def display_cost(self, calculate=False):
-        '''First grabs the total cost of the users order, then displays the total cost and items ordered.'''
-        if calculate:
-            self.calc_total()
-
-        cost = f"The total cost is ${self.total}0!"
-        self.order_frm.grid(row=2, columnspan=8, padx=10)
-        cost_lbl = ttk.Label(self.order_frm, text=cost,
-                            justify='center', font=(self.txt_style), 
-                            style='L.TLabel')
-        cost_lbl.grid(row=1, column=1, padx=5, pady=5)
-        ordered = f'You have ordered: {", ".join(self.food_ordered)}'
-        ordered_lbl = ttk.Label(self.order_frm, text=ordered,
-                            justify='center', font=(self.txt_style), 
-                            style='L.TLabel')
-        ordered_lbl.grid(row=2, column=1, padx=5, pady=5)
 
     def create_cost(self, chosen_item, remove_item=False):
         '''Method that gets the amount of an item the user wants then adds it together to get the current cost of the category the user is on.'''
         item = f"1x {self.current_items[chosen_item]}"
 
-        if remove_item: # Checks if user wants to remove an item
+        if remove_item: # Checks if user wishes to remove an item
             try:
                 self.food_ordered.remove(item)
             except:
                 return
-            self.quantity[chosen_item] -= 1
-            new_cost_item = self.prices[chosen_item] * self.quantity[chosen_item]
-            self.cost[chosen_item] = new_cost_item
-            self.final_cost.append(sum(self.cost))
-            del self.final_cost[:-1]
-            self.total = sum(self.final_cost)
+            self.current_quantity = self.total_quantity[self.current_category]
+            self.current_category_cost = self.total_category_cost[self.current_category] 
+            self.current_quantity[chosen_item] -= 1
+            new_cost_item = self.prices[chosen_item] * self.current_quantity[chosen_item]
+            self.current_category_cost[chosen_item] = new_cost_item
 
             for widgets in self.order_frm.winfo_children():
                 widgets.destroy()
 
-            self.display_cost()
-        
+            self.create_total_cost()      
+
         else:
-            self.quantity[chosen_item] += 1
+            if len(self.total_quantity[self.current_category]) != 0:
+                self.current_quantity[:] = self.total_quantity[self.current_category]
+                self.current_category_cost[:] = self.total_category_cost[self.current_category]
+
+            self.current_quantity[chosen_item] += 1
             self.food_ordered.append(item)
-            cost_item = self.prices[chosen_item] * self.quantity[chosen_item]
-            self.cost[chosen_item] = cost_item
+            cost_item = self.prices[chosen_item] * self.current_quantity[chosen_item]
+            self.current_category_cost[chosen_item] = cost_item
 
-            if len(self.current_cost) == 1:
-                del self.current_cost[0]
+            self.create_total_cost()
 
-            self.current_cost.append(sum(self.cost))
-            self.display_cost(True)
+    def create_total_cost(self):
+        '''Small method that adds up all the different total values(Quantity, Category Costs) to make up the total cost.'''
+        self.total_quantity[self.current_category] = self.current_quantity[:]
+        self.total_category_cost[self.current_category] = self.current_category_cost[:]
 
-    def calc_total(self):
-        '''Calculates the current total whenever the user adds an item or changes the category of food.'''
-        if len(self.current_cost) > 0:
-            t = self.current_cost.pop(-1)
-            self.final_cost.append(t)
-            del self.final_cost[:-1]
-            del self.current_cost[:]
-            if len(self.final_cost) >= 2:
-                self.total = sum(self.final_cost)
-                return self.total   
+        self.final_cost[self.current_category] = sum(self.total_category_cost[self.current_category])
+        
+        self.total = sum(self.final_cost.values())
 
-            self.total = sum(self.final_cost)
-            return self.total
+        self.display_cost()
 
+    def display_cost(self):
+        '''First grabs the total cost of the users order, then displays the total cost and items ordered.'''
+        cost = f"The total cost is ${self.total}0!"
+        cost_lbl = ttk.Label(self.order_frm, text=cost,
+                            justify='center', font=(self.txt_style), 
+                            style='L.TLabel')
+        ordered = f'You have ordered: {", ".join(self.food_ordered)}'
+        ordered_lbl = ttk.Label(self.order_frm, text=ordered,
+                            justify='center', font=(self.txt_style), 
+                            style='L.TLabel')
+
+        self.order_frm.grid(row=2, columnspan=8, padx=10)
+        cost_lbl.grid(row=1, column=1, padx=5, pady=5)
+        ordered_lbl.grid(row=2, column=1, padx=5, pady=5)
 
 class Admin(tk.Frame, MainApp):
     def __init__(self, parent):
