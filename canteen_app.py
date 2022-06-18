@@ -1,11 +1,11 @@
 # Sashin Amichand 11/05/22
 # 3DIP Internal Assessment - An online canteen ordering application
 # | Import tkinter | Import ttk (tkinter styling) 
-# | Imports sys for exit | Messagebox for windows pop up
+# | Imports the dictionary containing the cafeteria menu
+# | Imports sys for exit | Messagebox for windows pop up 
 import tkinter as tk
 from tkinter import ttk
-from cafe_menu import menu_items 
-import sys, tkinter.messagebox
+import sys, tkinter.messagebox, json
 
 class MainApp(tk.Tk):
     '''The class where my tkinter app is initilized, and any methods needed for the majority of my other classes is stored here ready for inhertiance.'''
@@ -18,6 +18,7 @@ class MainApp(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.close_window) 
 
         self.styling()
+
         self.configure(background=self.bg_color)
         self.intro()
 
@@ -96,7 +97,6 @@ class Student(tk.Frame, MainApp):
         self.parent.configure(background=self.bg_color)
 
         # Variables storing cost/menu item/food in a category and currently ordered food
-        self.menu_items = menu_items
         self.prices = []
         self.food_ordered = []
         self.current_items = []
@@ -106,10 +106,14 @@ class Student(tk.Frame, MainApp):
         self.total_quantity = {}
         self.current_category_cost = []
         self.total_category_cost = {}
-        
         # Variable for the storing individual category costs and then the total cost itself.
         self.final_cost = {}
         self.total = 0
+
+        # Opens cafe menu file, and saves it in a variable.
+        with open("cafe_menu.json") as file:
+            contents = json.load(file)
+        self.menu_items = contents["menu_items"][0]
 
         # Frames set
         self.about_frm = ttk.LabelFrame(self.parent, text='Order:', width=700,
@@ -122,7 +126,6 @@ class Student(tk.Frame, MainApp):
 
         self.about_frm.grid(row=0, columnspan=8, padx=10)
         self.menu_frm.grid(row=1, columnspan=8, padx=10)
-
         self.order()
 
     def order(self):
@@ -271,7 +274,8 @@ class Admin(tk.Frame, MainApp):
 
         self.styling()
         self.parent.configure(background=self.bg_color)
-
+        self.menu_items = MainApp.open_cafe_menu.menu_items
+        print(self.menu_items)
         self.login_frm = ttk.LabelFrame(self.parent, text='Login:', width=500,
                                     height=500, style='LF.TLabelframe')
         self.login_frm.grid(row=0, columnspan=3, padx=10, pady=10)
