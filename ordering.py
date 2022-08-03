@@ -39,7 +39,7 @@ class Student(tk.Frame, MainApp):
                                         style='TLabelframe')
 
         self.about_frm.grid(row=0, columnspan=8, padx=10)
-        self.menu_frm.grid(row=1, columnspan=8, padx=20)
+        self.menu_frm.grid(row=1, columnspan=8, padx=10, pady=10)
 
         self.order()
 
@@ -61,11 +61,6 @@ class Student(tk.Frame, MainApp):
                                 command=lambda category=name: self.display_category(category))
             beverages_btn.grid(row=3, column=columns, padx=5, pady=5, sticky="NW")    
             columns += 1
-
-        back_btn = ttk.Button(self.about_frm, text="Go Back", 
-                             command=lambda: self.go_back())
-
-        back_btn.grid(row=3, column=columns+1, padx=5, pady=5, sticky="NW")
 
     def display_category(self, type_category):
         '''Method that displays the cafeteria menu item widgets based on the category selected.'''
@@ -124,16 +119,29 @@ class Student(tk.Frame, MainApp):
 
     def create_cost(self, chosen_item, remove_item=False):
         '''Method that gets the amount of an item the user wants then adds it together to get the current cost of the category the user is on.'''
-        item = f"1x {self.current_items[chosen_item]}"
+        item = f"{self.current_items[chosen_item]}"
+        old_quantity = self.current_quantity[chosen_item]
+
+        if len(self.total_quantity[self.current_category]) != 0:
+            self.current_quantity[:] = self.total_quantity[self.current_category]
+            self.current_category_cost[:] = self.total_category_cost[self.current_category]
+            old_quantity = self.current_quantity[chosen_item]
+        
 
         if remove_item: # Checks if user wishes to remove an item
+            if self.current_quantity[chosen_item] == 0:
+                return
+
             try:
-                self.food_ordered.remove(item)
+                self.food_ordered.remove(f"{old_quantity}x {item}")
             except:
                 return
+
             self.current_quantity = self.total_quantity[self.current_category]
             self.current_category_cost = self.total_category_cost[self.current_category] 
             self.current_quantity[chosen_item] -= 1
+
+            self.food_ordered.append(f"{self.current_quantity[chosen_item]}x {item}")
             new_cost_item = self.prices[chosen_item] * self.current_quantity[chosen_item]
             self.current_category_cost[chosen_item] = new_cost_item
 
@@ -143,12 +151,17 @@ class Student(tk.Frame, MainApp):
             self.create_total_cost()      
 
         else:
-            if len(self.total_quantity[self.current_category]) != 0:
-                self.current_quantity[:] = self.total_quantity[self.current_category]
-                self.current_category_cost[:] = self.total_category_cost[self.current_category]
-
+            if self.current_quantity[chosen_item] >= 5:
+                tkinter.messagebox.showinfo("Maxium Quantity", "Please do not add an item more than 5x.")               
+                return 
+                
             self.current_quantity[chosen_item] += 1
-            self.food_ordered.append(item)
+        
+            if f"{old_quantity}x {item}" in self.food_ordered:
+                self.food_ordered.remove(f"{old_quantity}x {item}")
+
+            self.food_ordered.append(f"{self.current_quantity[chosen_item]}x {item}")
+            
             cost_item = self.prices[chosen_item] * self.current_quantity[chosen_item]
             self.current_category_cost[chosen_item] = cost_item
 
@@ -176,6 +189,6 @@ class Student(tk.Frame, MainApp):
                             justify='center', font=('Cormorant', '12', 'bold'), 
                             style='TLabel')
 
-        self.order_frm.grid(row=2, columnspan=8, padx=10)
+        self.order_frm.grid(row=2, columnspan=8, padx=10, pady=10)
         ordered_lbl.grid(row=1, column=1, padx=5, pady=5)
         cost_lbl.grid(row=2, column=1, padx=5, pady=5)

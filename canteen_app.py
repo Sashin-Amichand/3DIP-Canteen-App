@@ -35,12 +35,10 @@ class MainApp(tk.Tk):
                               justify='center', style='TLabel')
         intro_lbl.grid(row=1, columnspan=2, padx=5, pady=5)
 
-        admin_btn = ttk.Button(self.window, text="Admin", 
-                                command=lambda: self.open_window(Admin))
+
         student_btn = ttk.Button(self.window, text="Student", 
                                 command=lambda: self.open_window(Student))
 
-        admin_btn.grid(row=2, column=0, padx=5, pady=5, sticky="NE")
         student_btn.grid(row=2, column=1, padx=5, pady=5, sticky="NW")
         
     def open_window(self, chosen_window=None):
@@ -105,7 +103,7 @@ class MainApp(tk.Tk):
                               foreground=self.txt_color)
 
         self.TEntry = ttk.Style()
-        self.TEntry.configure("EntryStyle.TEntry", )
+        self.TEntry.configure("EntryStyle.TEntry", )\
 
         self.TButton = ttk.Style()
         self.TButton.configure('TButton', background=self.btn_color,
